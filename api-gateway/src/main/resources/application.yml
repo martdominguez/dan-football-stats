@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          default-filters:
+            - AddResponseHeader=X-Gateway, mini-score-api-gateway
+          routes:
+            - id: core-registry-route
+              uri: ${CORE_REGISTRY_BASE_URL:http://localhost:8081}
+              predicates:
+                - Path=/core-registry/**
+              filters:
+                - StripPrefix=1
+            - id: live-engine-route
+              uri: ${LIVE_ENGINE_BASE_URL:http://localhost:8082}
+              predicates:
+                - Path=/live-engine/**
+              filters:
+                - StripPrefix=1
+            - id: stats-route
+              uri: ${STATS_BASE_URL:http://localhost:8083}
+              predicates:
+                - Path=/stats/**
+              filters:
+                - StripPrefix=1
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: core-registry-service
+        url: /core-registry/api-docs
+      - name: live-engine-service
+        url: /live-engine/api-docs
+      - name: stats-service
+        url: /stats/api-docs
+
+management:
+  endpoint:
+    gateway:
+      access: read-only
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway

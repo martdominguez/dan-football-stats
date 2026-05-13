@@ -1,0 +1,13 @@
+meta {
+  name: Start Match
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8082/api/matches/{{matchId}}/start
+}
+
+headers {
+  Accept: application/json
+}

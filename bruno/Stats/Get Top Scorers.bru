@@ -1,0 +1,13 @@
+meta {
+  name: Get Top Scorers
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8083/api/stats/top-scorers?limit=10
+}
+
+headers {
+  Accept: application/json
+}

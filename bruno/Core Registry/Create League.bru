@@ -1,0 +1,21 @@
+meta {
+  name: Create League
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8081/api/leagues
+}
+
+headers {
+  content-type: application/json
+  Accept: application/json
+}
+
+body {
+  {
+    "name": "Student League",
+    "country": "Argentina"
+  }
+}

@@ -1,0 +1,23 @@
+meta {
+  name: Register Goal
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8082/api/matches/{{matchId}}/goals
+}
+
+headers {
+  content-type: application/json
+  Accept: application/json
+}
+
+body {
+  {
+    "teamId": "11111111-1111-1111-1111-111111111111",
+    "playerId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1",
+    "playerName": "Luna Diaz",
+    "minute": 18
+  }
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Create Team
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8081/api/teams
+}
+
+headers {
+  content-type: application/json
+  Accept: application/json
+}
+
+body {
+  {
+    "leagueId": 1,
+    "name": "Law Falcons",
+    "shortName": "LAF"
+  }
+}

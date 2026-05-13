@@ -1,0 +1,105 @@
+services:
+  postgres-core:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: core_registry
+      POSTGRES_USER: miniscore
+      POSTGRES_PASSWORD: miniscore
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U miniscore -d core_registry"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-core-data:/var/lib/postgresql/data
+
+  postgres-stats:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: stats_db
+      POSTGRES_USER: miniscore
+      POSTGRES_PASSWORD: miniscore
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U miniscore -d stats_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-stats-data:/var/lib/postgresql/data
+
+  mongo-live:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-live-data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  core-registry-service:
+    build:
+      context: .
+      dockerfile: core-registry-service/Dockerfile
+    depends_on:
+      postgres-core:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-core:5432/core_registry
+      SPRING_DATASOURCE_USERNAME: miniscore
+      SPRING_DATASOURCE_PASSWORD: miniscore
+    expose:
+      - "8080"
+    ports:
+      - "8081:8080"
+
+  live-engine-service:
+    build:
+      context: .
+      dockerfile: live-engine-service/Dockerfile
+    depends_on:
+      - mongo-live
+      - rabbitmq
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo-live:27017/live_engine
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    expose:
+      - "8080"
+    ports:
+      - "8082:8080"
+
+  stats-service:
+    build:
+      context: .
+      dockerfile: stats-service/Dockerfile
+    depends_on:
+      postgres-stats:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-stats:5432/stats_db
+      SPRING_DATASOURCE_USERNAME: miniscore
+      SPRING_DATASOURCE_PASSWORD: miniscore
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    expose:
+      - "8080"
+    ports:
+      - "8083:8080"
+
+volumes:
+  postgres-core-data:
+  postgres-stats-data:
+  mongo-live-data:

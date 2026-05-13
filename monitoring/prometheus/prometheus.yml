@@ -1,0 +1,34 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: discovery-server
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - discovery-server:8761
+
+  - job_name: core-registry-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - core-registry-service:8080
+
+  - job_name: live-engine-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - live-engine-service:8080
+
+  - job_name: stats-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - stats-service:8080
+
+  - job_name: api-gateway
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - api-gateway:8080

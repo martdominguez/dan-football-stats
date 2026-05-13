@@ -5,7 +5,9 @@ meta {
 }
 
 post {
-  url: http://localhost:8082/api/matches/{{matchId}}/goals
+  url: http://localhost:8080/live-engine/api/matches/{{matchId}}/goals
+  body: json
+  auth: none
 }
 
 headers {
@@ -13,7 +15,7 @@ headers {
   Accept: application/json
 }
 
-body {
+body:json {
   {
     "teamId": "11111111-1111-1111-1111-111111111111",
     "playerId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1",

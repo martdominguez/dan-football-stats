@@ -4,9 +4,10 @@ server:
 spring:
   application:
     name: live-engine-service
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/live_engine
+  mongodb:
+    uri: mongodb://localhost:27017/live_engine
+    representation:
+      uuid: standard
   rabbitmq:
     host: localhost
     port: 5672
@@ -31,3 +32,19 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  endpoints:
+    access:
+      default: unrestricted
+    web:
+      exposure:
+        include: "*"
+  prometheus:
+    metrics:
+      export:
+        enabled: true

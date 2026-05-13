@@ -5,7 +5,9 @@ meta {
 }
 
 post {
-  url: http://localhost:8082/api/matches/{{matchId}}/end
+  url: http://localhost:8080/live-engine/api/matches/{{matchId}}/end
+  body: none
+  auth: none
 }
 
 headers {

@@ -55,9 +55,18 @@ springdoc:
 
 management:
   endpoint:
+    health:
+      show-details: always
+      show-components: always
     gateway:
-      access: read-only
+      access: unrestricted
   endpoints:
+    access:
+      default: unrestricted
     web:
       exposure:
-        include: health,info,gateway
+        include: "*"
+  prometheus:
+    metrics:
+      export:
+        enabled: true

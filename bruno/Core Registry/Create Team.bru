@@ -5,7 +5,9 @@ meta {
 }
 
 post {
-  url: http://localhost:8081/api/teams
+  url: http://localhost:8080/core-registry/api/teams
+  body: json
+  auth: none
 }
 
 headers {
@@ -13,7 +15,7 @@ headers {
   Accept: application/json
 }
 
-body {
+body:json {
   {
     "leagueId": 1,
     "name": "Law Falcons",

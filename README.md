@@ -6,6 +6,11 @@ Proyecto de ejemplo con tres microservicios:
 - `live-engine-service`: operación de partidos en vivo y publicación de eventos.
 - `stats-service`: proyecciones de standings y goleadores.
 
+También incluye dos componentes de infraestructura:
+
+- `discovery-server`: Eureka para service discovery.
+- `api-gateway`: punto de entrada único para enrutar tráfico a los microservicios.
+
 ## Ejecutar el proyecto
 
 Levantar contenedores:
@@ -38,6 +43,16 @@ Eureka:
 
 - [http://localhost:8761/](http://localhost:8761/)
 
+Prometheus:
+
+- [http://localhost:9090/](http://localhost:9090/)
+
+Grafana:
+
+- [http://localhost:3000/](http://localhost:3000/)
+- usuario por defecto: `admin`
+- password por defecto: `admin`
+
 Escalar un servicio:
 
 ```bash
@@ -45,6 +60,38 @@ docker compose scale stats-service=3
 ```
 
 ## Cambios incorporados
+
+### Observabilidad local
+
+Se agregó una stack local de observabilidad con Prometheus y Grafana.
+
+- Todos los servicios Spring Boot exponen `/actuator` y `/actuator/prometheus`.
+- Prometheus scrapea automáticamente:
+  - `discovery-server`
+  - `core-registry-service`
+  - `live-engine-service`
+  - `stats-service`
+  - `api-gateway`
+- Grafana arranca con Prometheus ya provisionado como datasource.
+
+La configuración versionada vive en:
+
+- `monitoring/prometheus/prometheus.yml`
+- `monitoring/grafana/provisioning/datasources/prometheus.yml`
+- `monitoring/grafana/provisioning/dashboards/dashboard-provider.yml`
+- `monitoring/grafana/dashboards/spring-boot-observability.json`
+
+Esto sí conviene tenerlo en carpetas locales del repo, porque permite:
+
+- reproducir el entorno sin configuración manual;
+- revisar cambios de observabilidad en git;
+- extender luego dashboards y alertas bajo el mismo esquema.
+
+Grafana además arranca con un dashboard provisionado:
+
+- `Spring Boot Observability`
+- selector por servicio
+- panels de disponibilidad, request rate, latencia P95, error ratio, heap, CPU, threads y outcomes HTTP
 
 Se agregó un escenario de comunicación síncrona desde `stats-service` hacia `core-registry-service` para enriquecer las respuestas de estadísticas.
 

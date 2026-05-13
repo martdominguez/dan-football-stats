@@ -1,0 +1,16 @@
+meta {
+  name: TEST ENDPOINT STATS
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:8080/stats/api/test/context
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

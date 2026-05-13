@@ -5,7 +5,9 @@ meta {
 }
 
 post {
-  url: http://localhost:8081/api/leagues
+  url: http://localhost:8080/core-registry/api/leagues
+  body: json
+  auth: none
 }
 
 headers {
@@ -13,7 +15,7 @@ headers {
   Accept: application/json
 }
 
-body {
+body:json {
   {
     "name": "Student League",
     "country": "Argentina"

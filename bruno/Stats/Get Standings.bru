@@ -1,11 +1,17 @@
 meta {
   name: Get Standings
   type: http
-  seq: 1
+  seq: 2
 }
 
 get {
-  url: http://localhost:8083/api/stats/standings?leagueName=University%20Premier%20League
+  url: http://localhost:8080/stats/api/stats/standings?leagueName=University%20Premier%20League
+  body: none
+  auth: none
+}
+
+params:query {
+  leagueName: University%20Premier%20League
 }
 
 headers {

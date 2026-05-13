@@ -5,7 +5,9 @@ meta {
 }
 
 post {
-  url: http://localhost:8081/api/players
+  url: http://localhost:8080/core-registry/api/players
+  body: json
+  auth: none
 }
 
 headers {
@@ -13,7 +15,7 @@ headers {
   Accept: application/json
 }
 
-body {
+body:json {
   {
     "teamId": "11111111-1111-1111-1111-111111111111",
     "firstName": "Sofia",

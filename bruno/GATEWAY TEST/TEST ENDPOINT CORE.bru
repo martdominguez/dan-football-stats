@@ -1,0 +1,16 @@
+meta {
+  name: TEST ENDPOINT CORE
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:8080/core-registry/api/test/context
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

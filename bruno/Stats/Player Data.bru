@@ -1,0 +1,16 @@
+meta {
+  name: Player Data
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8080/core-registry/api/players/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

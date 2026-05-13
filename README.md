@@ -17,3 +17,13 @@ Con el API gateway configurado podemos acceder a las URL
 http://localhost:8080/core-registry/api/test/context
 http://localhost:8080/live-engine/api/test/context
 http://localhost:8080/stats/api/test/context
+
+Cuando configuramos EUREKA
+
+http://localhost:8761/
+
+Luego escalar algun servicio
+
+```
+docker compose scale stats-service=3
+```

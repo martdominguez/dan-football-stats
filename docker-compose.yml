@@ -43,6 +43,16 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+  
+  discovery-server:
+    build:
+      context: .
+      dockerfile: discovery-server/Dockerfile
+    environment:
+      EUREKA_SERVER_URL: http://discovery-server:8761/eureka/
+    ports:
+      - "8761:8761"
+
   core-registry-service:
     build:
       context: .
@@ -54,10 +64,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-core:5432/core_registry
       SPRING_DATASOURCE_USERNAME: miniscore
       SPRING_DATASOURCE_PASSWORD: miniscore
+      EUREKA_SERVER_URL: http://discovery-server:8761/eureka/
     expose:
       - "8080"
-    ports:
-      - "8081:8080"
 
   live-engine-service:
     build:
@@ -72,10 +81,9 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
+      EUREKA_SERVER_URL: http://discovery-server:8761/eureka/
     expose:
       - "8080"
-    ports:
-      - "8082:8080"
 
   stats-service:
     build:
@@ -94,15 +102,15 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
+      EUREKA_SERVER_URL: http://discovery-server:8761/eureka/
     expose:
       - "8080"
-    ports:
-      - "8083:8080"
   api-gateway:
     build:
       context: .
       dockerfile: api-gateway/Dockerfile
     depends_on:
+      - discovery-server
       - core-registry-service
       - live-engine-service
       - stats-service
@@ -110,6 +118,7 @@ services:
       - CORE_REGISTRY_BASE_URL=http://core-registry-service:8080
       - LIVE_ENGINE_BASE_URL=http://live-engine-service:8080
       - STATS_BASE_URL=http://stats-service:8080
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka/
     ports:
       - "8080:8080"
 

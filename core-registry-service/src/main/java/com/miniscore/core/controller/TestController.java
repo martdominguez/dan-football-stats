@@ -43,7 +43,6 @@ public class TestController {
             "serviceName",
             environment.getProperty("spring.application.name")
         );
-        context.put("timestampIso", now.toString());
         context.put(
             "instanceId",
             environment.getProperty("eureka.instance.instance-id")
@@ -51,6 +50,7 @@ public class TestController {
         //        context.put("serverPort", environment.getProperty("local.server.port", request.getLocalPort()));
         context.put("serverHostName", resolveHostName());
         context.put("serverIp", resolveHostAddress());
+        context.put("timestampIso", now.toString());
         context.put(
             "jvmProcess",
             ManagementFactory.getRuntimeMXBean().getName()
@@ -59,10 +59,6 @@ public class TestController {
         context.put("queryString", request.getQueryString());
         context.put("remoteAddress", request.getRemoteAddr());
         context.put("remoteHost", request.getRemoteHost());
-        context.put("forwardedFor", request.getHeader("X-Forwarded-For"));
-        context.put("forwardedHost", request.getHeader("X-Forwarded-Host"));
-        context.put("forwardedProto", request.getHeader("X-Forwarded-Proto"));
-        context.put("gatewayHeader", request.getHeader("X-Gateway"));
         context.put("threadName", Thread.currentThread().getName());
 
         return context;

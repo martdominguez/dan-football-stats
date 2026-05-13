@@ -12,23 +12,35 @@ spring:
             - AddResponseHeader=X-Gateway, mini-score-api-gateway
           routes:
             - id: core-registry-route
-              uri: ${CORE_REGISTRY_BASE_URL:http://localhost:8081}
+              uri: lb://CORE-REGISTRY-SERVICE
               predicates:
                 - Path=/core-registry/**
               filters:
                 - StripPrefix=1
             - id: live-engine-route
-              uri: ${LIVE_ENGINE_BASE_URL:http://localhost:8082}
+              uri: lb://LIVE-ENGINE-SERVICE
               predicates:
                 - Path=/live-engine/**
               filters:
                 - StripPrefix=1
             - id: stats-route
-              uri: ${STATS_BASE_URL:http://localhost:8083}
+              uri: lb://STATS-SERVICE
               predicates:
                 - Path=/stats/**
               filters:
                 - StripPrefix=1
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 5
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
 
 springdoc:
   swagger-ui:

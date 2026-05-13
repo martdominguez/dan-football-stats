@@ -7,6 +7,8 @@ import com.miniscore.stats.dto.StandingResponse;
 import com.miniscore.stats.dto.TopScorerResponse;
 import com.miniscore.stats.entity.PlayerScorer;
 import com.miniscore.stats.entity.TeamStanding;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +20,7 @@ public class StatsEnrichmentService {
         this.coreRegistryClient = coreRegistryClient;
     }
 
+    @CircuitBreaker(name = "coreRegistry", fallbackMethod = "fallbackStanding")
     public StandingResponse enrichStanding(TeamStanding row) {
         CoreTeamResponse team = coreRegistryClient.getTeam(row.getTeamId());
         return new StandingResponse(
@@ -35,9 +38,10 @@ public class StatsEnrichmentService {
         );
     }
 
+    @CircuitBreaker(name = "coreRegistry", fallbackMethod = "fallbackTopScorer")
     public TopScorerResponse enrichTopScorer(PlayerScorer row) {
         CorePlayerResponse player = coreRegistryClient.getPlayer(row.getPlayerId());
-        CoreTeamResponse team = coreRegistryClient.getTeam(row.getTeamId());
+        CoreTeamResponse team = resolveTeam(row.getTeamId(), row.getTeamName());
 
         return new TopScorerResponse(
                 row.getPlayerId(),
@@ -47,6 +51,45 @@ public class StatsEnrichmentService {
                 row.getTeamId(),
                 team.name(),
                 team.shortName(),
+                row.getGoals()
+        );
+    }
+
+    private CoreTeamResponse resolveTeam(UUID teamId, String fallbackTeamName) {
+        try {
+            return coreRegistryClient.getTeam(teamId);
+        } catch (RuntimeException exception) {
+            return new CoreTeamResponse(teamId, fallbackTeamName, null, null, null);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private StandingResponse fallbackStanding(TeamStanding row, Throwable throwable) {
+        return new StandingResponse(
+                row.getTeamId(),
+                row.getTeamName(),
+                null,
+                row.getLeagueName(),
+                row.getPlayed(),
+                row.getWon(),
+                row.getDrawn(),
+                row.getLost(),
+                row.getGoalsFor(),
+                row.getGoalsAgainst(),
+                row.getPoints()
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private TopScorerResponse fallbackTopScorer(PlayerScorer row, Throwable throwable) {
+        return new TopScorerResponse(
+                row.getPlayerId(),
+                row.getPlayerName(),
+                null,
+                null,
+                row.getTeamId(),
+                row.getTeamName(),
+                null,
                 row.getGoals()
         );
     }

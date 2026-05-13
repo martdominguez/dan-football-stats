@@ -8,13 +8,25 @@ import com.miniscore.stats.dto.TopScorerResponse;
 import com.miniscore.stats.entity.PlayerScorer;
 import com.miniscore.stats.entity.TeamStanding;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.annotation.PreDestroy;
+import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class StatsEnrichmentService {
 
+    private static final Duration TOP_SCORER_TIMEOUT = Duration.ofMillis(1000);
+
     private final CoreRegistryClient coreRegistryClient;
+    private final ExecutorService timeoutExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
     public StatsEnrichmentService(CoreRegistryClient coreRegistryClient) {
         this.coreRegistryClient = coreRegistryClient;
@@ -40,19 +52,21 @@ public class StatsEnrichmentService {
 
     @CircuitBreaker(name = "coreRegistry", fallbackMethod = "fallbackTopScorer")
     public TopScorerResponse enrichTopScorer(PlayerScorer row) {
-        CorePlayerResponse player = coreRegistryClient.getPlayer(row.getPlayerId());
-        CoreTeamResponse team = resolveTeam(row.getTeamId(), row.getTeamName());
+        return executeWithinTimeout(() -> {
+            CorePlayerResponse player = coreRegistryClient.getPlayer(row.getPlayerId());
+            CoreTeamResponse team = resolveTeam(row.getTeamId(), row.getTeamName());
 
-        return new TopScorerResponse(
-                row.getPlayerId(),
-                joinName(player.firstName(), player.lastName(), row.getPlayerName()),
-                player.position(),
-                player.shirtNumber(),
-                row.getTeamId(),
-                team.name(),
-                team.shortName(),
-                row.getGoals()
-        );
+            return new TopScorerResponse(
+                    row.getPlayerId(),
+                    joinName(player.firstName(), player.lastName(), row.getPlayerName()),
+                    player.position(),
+                    player.shirtNumber(),
+                    row.getTeamId(),
+                    team.name(),
+                    team.shortName(),
+                    row.getGoals()
+            );
+        }, TOP_SCORER_TIMEOUT);
     }
 
     private CoreTeamResponse resolveTeam(UUID teamId, String fallbackTeamName) {
@@ -97,5 +111,29 @@ public class StatsEnrichmentService {
     private String joinName(String firstName, String lastName, String fallback) {
         String fullName = ((firstName == null ? "" : firstName) + " " + (lastName == null ? "" : lastName)).trim();
         return fullName.isBlank() ? fallback : fullName;
+    }
+
+    private <T> T executeWithinTimeout(Callable<T> action, Duration timeout) {
+        Future<T> future = timeoutExecutor.submit(action);
+        try {
+            return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+        } catch (TimeoutException exception) {
+            future.cancel(true);
+            throw new RuntimeException("Top scorer enrichment timed out after " + timeout.toMillis() + " ms", exception);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Top scorer enrichment was interrupted", exception);
+        } catch (ExecutionException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException runtimeException) {
+                throw runtimeException;
+            }
+            throw new RuntimeException("Top scorer enrichment failed", cause);
+        }
+    }
+
+    @PreDestroy
+    void shutdownTimeoutExecutor() {
+        timeoutExecutor.shutdown();
     }
 }

@@ -19,6 +19,14 @@ spring:
     port: 5672
     username: guest
     password: guest
+  cloud:
+    openfeign:
+      client:
+        config:
+          core-registry-service:
+            connectTimeout: 1000
+            readTimeout: 1500
+            loggerLevel: basic
 
 eureka:
   client:

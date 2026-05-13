@@ -44,6 +44,12 @@ public class PlayerService {
                 .toList();
     }
 
+    public PlayerResponse getById(UUID playerId) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Player not found: " + playerId));
+        return toResponse(player);
+    }
+
     PlayerResponse toResponse(Player player) {
         return new PlayerResponse(
                 player.getPlayerId(),

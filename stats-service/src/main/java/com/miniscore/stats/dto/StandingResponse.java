@@ -5,6 +5,7 @@ import java.util.UUID;
 public record StandingResponse(
         UUID teamId,
         String teamName,
+        String teamShortName,
         String leagueName,
         Integer played,
         Integer won,

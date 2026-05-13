@@ -14,11 +14,14 @@ public class StatsQueryService {
 
     private final TeamStandingRepository teamStandingRepository;
     private final PlayerScorerRepository playerScorerRepository;
+    private final StatsEnrichmentService statsEnrichmentService;
 
     public StatsQueryService(TeamStandingRepository teamStandingRepository,
-                             PlayerScorerRepository playerScorerRepository) {
+                             PlayerScorerRepository playerScorerRepository,
+                             StatsEnrichmentService statsEnrichmentService) {
         this.teamStandingRepository = teamStandingRepository;
         this.playerScorerRepository = playerScorerRepository;
+        this.statsEnrichmentService = statsEnrichmentService;
     }
 
     public List<StandingResponse> getStandings(String leagueName) {
@@ -32,18 +35,7 @@ public class StatsQueryService {
                         .thenComparing(Comparator.comparingInt(TeamStanding::goalDifference).reversed())
                         .thenComparing(Comparator.comparingInt(TeamStanding::getGoalsFor).reversed())
                         .thenComparing(TeamStanding::getTeamName))
-                .map(row -> new StandingResponse(
-                        row.getTeamId(),
-                        row.getTeamName(),
-                        row.getLeagueName(),
-                        row.getPlayed(),
-                        row.getWon(),
-                        row.getDrawn(),
-                        row.getLost(),
-                        row.getGoalsFor(),
-                        row.getGoalsAgainst(),
-                        row.getPoints()
-                ))
+                .map(statsEnrichmentService::enrichStanding)
                 .toList();
     }
 
@@ -52,13 +44,7 @@ public class StatsQueryService {
                 .sorted(Comparator.comparing(com.miniscore.stats.entity.PlayerScorer::getGoals).reversed()
                         .thenComparing(com.miniscore.stats.entity.PlayerScorer::getPlayerName))
                 .limit(Math.max(limit, 1))
-                .map(row -> new TopScorerResponse(
-                        row.getPlayerId(),
-                        row.getPlayerName(),
-                        row.getTeamId(),
-                        row.getTeamName(),
-                        row.getGoals()
-                ))
+                .map(statsEnrichmentService::enrichTopScorer)
                 .toList();
     }
 }

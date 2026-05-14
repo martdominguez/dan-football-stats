@@ -2,15 +2,14 @@ package com.miniscore.live.dto;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 public record MatchResponse(
-        UUID matchId,
-        UUID leagueId,
+        String matchId,
+        Long leagueId,
         String leagueName,
-        UUID homeTeamId,
+        Long homeTeamId,
         String homeTeamName,
-        UUID awayTeamId,
+        Long awayTeamId,
         String awayTeamName,
         String status,
         Integer homeScore,

@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,7 +35,7 @@ public class PlayerController {
 
     @GetMapping("/{playerId}")
     @Operation(summary = "Get player by id", description = "Returns a single player using the player ID owned by the core registry service.")
-    public PlayerResponse getPlayer(@PathVariable UUID playerId) {
+    public PlayerResponse getPlayer(@PathVariable Long playerId) {
         return playerService.getById(playerId);
     }
 

@@ -8,7 +8,6 @@ import com.miniscore.live.service.MatchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,31 +37,31 @@ public class MatchController {
 
     @GetMapping("/{matchId}")
     @Operation(summary = "Get match", description = "Returns the current live state and timeline of a match.")
-    public MatchResponse getMatch(@PathVariable UUID matchId) {
+    public MatchResponse getMatch(@PathVariable String matchId) {
         return matchService.getMatch(matchId);
     }
 
     @PostMapping("/{matchId}/start")
     @Operation(summary = "Start match", description = "Transitions a match from CREATED to STARTED.")
-    public MatchResponse startMatch(@PathVariable UUID matchId) {
+    public MatchResponse startMatch(@PathVariable String matchId) {
         return matchService.startMatch(matchId);
     }
 
     @PostMapping("/{matchId}/goals")
     @Operation(summary = "Register goal", description = "Appends a goal event to the match timeline and publishes a GoalScoredEvent.")
-    public MatchResponse registerGoal(@PathVariable UUID matchId, @Valid @RequestBody GoalRequest request) {
+    public MatchResponse registerGoal(@PathVariable String matchId, @Valid @RequestBody GoalRequest request) {
         return matchService.registerGoal(matchId, request);
     }
 
     @PostMapping("/{matchId}/cards")
     @Operation(summary = "Register card", description = "Appends a card event to the match timeline.")
-    public MatchResponse registerCard(@PathVariable UUID matchId, @Valid @RequestBody CardRequest request) {
+    public MatchResponse registerCard(@PathVariable String matchId, @Valid @RequestBody CardRequest request) {
         return matchService.registerCard(matchId, request);
     }
 
     @PostMapping("/{matchId}/end")
     @Operation(summary = "End match", description = "Transitions a match to ENDED and publishes a MatchEndedEvent.")
-    public MatchResponse endMatch(@PathVariable UUID matchId) {
+    public MatchResponse endMatch(@PathVariable String matchId) {
         return matchService.endMatch(matchId);
     }
 }

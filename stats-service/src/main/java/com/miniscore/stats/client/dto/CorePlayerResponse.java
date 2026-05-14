@@ -1,14 +1,12 @@
 package com.miniscore.stats.client.dto;
 
-import java.util.UUID;
-
 public record CorePlayerResponse(
-        UUID playerId,
+        Long playerId,
         String firstName,
         String lastName,
         String position,
         Integer shirtNumber,
-        UUID teamId,
+        Long teamId,
         String teamName
 ) {
 }

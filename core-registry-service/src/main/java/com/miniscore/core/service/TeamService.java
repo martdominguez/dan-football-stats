@@ -8,7 +8,6 @@ import com.miniscore.core.exception.ResourceNotFoundException;
 import com.miniscore.core.repository.LeagueRepository;
 import com.miniscore.core.repository.TeamRepository;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,7 +26,6 @@ public class TeamService {
                 .orElseThrow(() -> new ResourceNotFoundException("League not found: " + request.leagueId()));
 
         Team team = new Team(
-                request.teamId() != null ? request.teamId() : UUID.randomUUID(),
                 request.name(),
                 request.shortName(),
                 league
@@ -41,7 +39,7 @@ public class TeamService {
                 .toList();
     }
 
-    public TeamResponse getById(UUID teamId) {
+    public TeamResponse getById(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new ResourceNotFoundException("Team not found: " + teamId));
         return toResponse(team);

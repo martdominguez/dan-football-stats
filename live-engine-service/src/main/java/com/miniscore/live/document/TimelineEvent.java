@@ -1,20 +1,19 @@
 package com.miniscore.live.document;
 
 import java.time.Instant;
-import java.util.UUID;
 
 public class TimelineEvent {
 
     private String type;
     private int minute;
-    private UUID teamId;
+    private Long teamId;
     private String teamName;
-    private UUID playerId;
+    private Long playerId;
     private String playerName;
     private String cardType;
     private Instant recordedAt;
 
-    public TimelineEvent(String type, int minute, UUID teamId, String teamName, UUID playerId, String playerName,
+    public TimelineEvent(String type, int minute, Long teamId, String teamName, Long playerId, String playerName,
                          String cardType, Instant recordedAt) {
         this.type = type;
         this.minute = minute;
@@ -37,7 +36,7 @@ public class TimelineEvent {
         return minute;
     }
 
-    public UUID getTeamId() {
+    public Long getTeamId() {
         return teamId;
     }
 
@@ -45,7 +44,7 @@ public class TimelineEvent {
         return teamName;
     }
 
-    public UUID getPlayerId() {
+    public Long getPlayerId() {
         return playerId;
     }
 

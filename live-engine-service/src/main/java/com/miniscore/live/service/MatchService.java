@@ -15,7 +15,7 @@ import com.miniscore.live.exception.ResourceNotFoundException;
 import com.miniscore.live.repository.MatchRepository;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,7 +31,6 @@ public class MatchService {
 
     public MatchResponse createMatch(CreateMatchRequest request) {
         MatchDocument match = new MatchDocument(
-                UUID.randomUUID(),
                 request.leagueId(),
                 request.leagueName(),
                 request.homeTeamId(),
@@ -43,11 +42,11 @@ public class MatchService {
         return toResponse(matchRepository.save(match));
     }
 
-    public MatchResponse getMatch(UUID matchId) {
+    public MatchResponse getMatch(String matchId) {
         return toResponse(getMatchDocument(matchId));
     }
 
-    public MatchResponse startMatch(UUID matchId) {
+    public MatchResponse startMatch(String matchId) {
         MatchDocument match = getMatchDocument(matchId);
         if (match.getStatus() != MatchStatus.CREATED) {
             throw new BusinessRuleException("Only matches in CREATED state can be started.");
@@ -57,7 +56,7 @@ public class MatchService {
         return toResponse(matchRepository.save(match));
     }
 
-    public MatchResponse registerGoal(UUID matchId, GoalRequest request) {
+    public MatchResponse registerGoal(String matchId, GoalRequest request) {
         MatchDocument match = getStartedMatch(matchId);
         String teamName = resolveTeamName(match, request.teamId());
         Instant occurredAt = Instant.now();
@@ -81,7 +80,7 @@ public class MatchService {
 
         MatchDocument saved = matchRepository.save(match);
         eventPublisherService.publishGoalScored(new GoalScoredEvent(
-                saved.getMatchId(),
+                saved.getId().toHexString(),
                 saved.getLeagueId(),
                 saved.getLeagueName(),
                 request.teamId(),
@@ -96,7 +95,7 @@ public class MatchService {
         return toResponse(saved);
     }
 
-    public MatchResponse registerCard(UUID matchId, CardRequest request) {
+    public MatchResponse registerCard(String matchId, CardRequest request) {
         MatchDocument match = getStartedMatch(matchId);
         String teamName = resolveTeamName(match, request.teamId());
 
@@ -114,14 +113,14 @@ public class MatchService {
         return toResponse(matchRepository.save(match));
     }
 
-    public MatchResponse endMatch(UUID matchId) {
+    public MatchResponse endMatch(String matchId) {
         MatchDocument match = getStartedMatch(matchId);
         match.setStatus(MatchStatus.ENDED);
         match.setEndedAt(Instant.now());
         MatchDocument saved = matchRepository.save(match);
 
         eventPublisherService.publishMatchEnded(new MatchEndedEvent(
-                saved.getMatchId(),
+                saved.getId().toHexString(),
                 saved.getLeagueId(),
                 saved.getLeagueName(),
                 saved.getHomeTeamId(),
@@ -136,12 +135,12 @@ public class MatchService {
         return toResponse(saved);
     }
 
-    private MatchDocument getMatchDocument(UUID matchId) {
-        return matchRepository.findByMatchId(matchId)
+    private MatchDocument getMatchDocument(String matchId) {
+        return matchRepository.findById(toObjectId(matchId))
                 .orElseThrow(() -> new ResourceNotFoundException("Match not found: " + matchId));
     }
 
-    private MatchDocument getStartedMatch(UUID matchId) {
+    private MatchDocument getStartedMatch(String matchId) {
         MatchDocument match = getMatchDocument(matchId);
         if (match.getStatus() != MatchStatus.STARTED) {
             throw new BusinessRuleException("Only matches in STARTED state can receive live actions.");
@@ -149,7 +148,7 @@ public class MatchService {
         return match;
     }
 
-    private String resolveTeamName(MatchDocument match, UUID teamId) {
+    private String resolveTeamName(MatchDocument match, Long teamId) {
         if (teamId.equals(match.getHomeTeamId())) {
             return match.getHomeTeamName();
         }
@@ -174,7 +173,7 @@ public class MatchService {
                 .toList();
 
         return new MatchResponse(
-                match.getMatchId(),
+                match.getId().toHexString(),
                 match.getLeagueId(),
                 match.getLeagueName(),
                 match.getHomeTeamId(),
@@ -189,5 +188,12 @@ public class MatchService {
                 match.getEndedAt(),
                 timeline
         );
+    }
+
+    private ObjectId toObjectId(String matchId) {
+        if (!ObjectId.isValid(matchId)) {
+            throw new ResourceNotFoundException("Match not found: " + matchId);
+        }
+        return new ObjectId(matchId);
     }
 }

@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,13 +35,13 @@ public class TeamController {
 
     @GetMapping("/{teamId}")
     @Operation(summary = "Get team by id", description = "Returns a single team using the team ID owned by the core registry service.")
-    public TeamResponse getTeam(@PathVariable UUID teamId) {
+    public TeamResponse getTeam(@PathVariable Long teamId) {
         return teamService.getById(teamId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Create team", description = "Creates a new team and optionally accepts a provided team ID for educational scenarios.")
+    @Operation(summary = "Create team", description = "Creates a new team with an auto-generated team ID.")
     public TeamResponse createTeam(@Valid @RequestBody CreateTeamRequest request) {
         return teamService.create(request);
     }

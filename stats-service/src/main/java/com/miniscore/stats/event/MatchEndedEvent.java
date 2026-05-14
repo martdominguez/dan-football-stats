@@ -1,16 +1,15 @@
 package com.miniscore.stats.event;
 
 import java.time.Instant;
-import java.util.UUID;
 
 public record MatchEndedEvent(
-        UUID matchId,
-        UUID leagueId,
+        String matchId,
+        Long leagueId,
         String leagueName,
-        UUID homeTeamId,
+        Long homeTeamId,
         String homeTeamName,
         Integer homeScore,
-        UUID awayTeamId,
+        Long awayTeamId,
         String awayTeamName,
         Integer awayScore,
         Instant occurredAt

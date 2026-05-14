@@ -1,16 +1,6 @@
 package com.miniscore.stats.service;
 
-import com.miniscore.stats.client.CoreRegistryClient;
-import com.miniscore.stats.client.dto.CorePlayerResponse;
-import com.miniscore.stats.client.dto.CoreTeamResponse;
-import com.miniscore.stats.dto.StandingResponse;
-import com.miniscore.stats.dto.TopScorerResponse;
-import com.miniscore.stats.entity.PlayerScorer;
-import com.miniscore.stats.entity.TeamStanding;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import jakarta.annotation.PreDestroy;
 import java.time.Duration;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +8,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import org.springframework.stereotype.Service;
+
+import com.miniscore.stats.client.CoreRegistryClient;
+import com.miniscore.stats.client.dto.CorePlayerResponse;
+import com.miniscore.stats.client.dto.CoreTeamResponse;
+import com.miniscore.stats.dto.StandingResponse;
+import com.miniscore.stats.dto.TopScorerResponse;
+import com.miniscore.stats.entity.PlayerScorer;
+import com.miniscore.stats.entity.TeamStanding;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.annotation.PreDestroy;
 
 @Service
 public class StatsEnrichmentService {
@@ -69,7 +71,7 @@ public class StatsEnrichmentService {
         }, TOP_SCORER_TIMEOUT);
     }
 
-    private CoreTeamResponse resolveTeam(UUID teamId, String fallbackTeamName) {
+    private CoreTeamResponse resolveTeam(Long teamId, String fallbackTeamName) {
         try {
             return coreRegistryClient.getTeam(teamId);
         } catch (RuntimeException exception) {
@@ -99,7 +101,7 @@ public class StatsEnrichmentService {
         return new TopScorerResponse(
                 row.getPlayerId(),
                 row.getPlayerName(),
-                null,
+                "FALLBACK",
                 null,
                 row.getTeamId(),
                 row.getTeamName(),

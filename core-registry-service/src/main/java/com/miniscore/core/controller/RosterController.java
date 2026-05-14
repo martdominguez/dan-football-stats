@@ -4,7 +4,6 @@ import com.miniscore.core.dto.RosterResponse;
 import com.miniscore.core.service.RosterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +22,7 @@ public class RosterController {
 
     @GetMapping("/team/{teamId}")
     @Operation(summary = "Get team roster", description = "Returns the roster for a given team ID, including team and league context.")
-    public RosterResponse getRoster(@PathVariable UUID teamId) {
+    public RosterResponse getRoster(@PathVariable Long teamId) {
         return rosterService.getByTeamId(teamId);
     }
 }

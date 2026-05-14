@@ -1,14 +1,13 @@
 package com.miniscore.live.dto;
 
 import java.time.Instant;
-import java.util.UUID;
 
 public record TimelineEventResponse(
         String type,
         Integer minute,
-        UUID teamId,
+        Long teamId,
         String teamName,
-        UUID playerId,
+        Long playerId,
         String playerName,
         String cardType,
         Instant recordedAt

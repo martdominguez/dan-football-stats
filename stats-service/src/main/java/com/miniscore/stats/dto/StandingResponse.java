@@ -1,9 +1,7 @@
 package com.miniscore.stats.dto;
 
-import java.util.UUID;
-
 public record StandingResponse(
-        UUID teamId,
+        Long teamId,
         String teamName,
         String teamShortName,
         String leagueName,

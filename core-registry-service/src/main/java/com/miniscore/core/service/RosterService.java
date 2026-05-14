@@ -5,7 +5,6 @@ import com.miniscore.core.entity.Team;
 import com.miniscore.core.exception.ResourceNotFoundException;
 import com.miniscore.core.repository.PlayerRepository;
 import com.miniscore.core.repository.TeamRepository;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +20,7 @@ public class RosterService {
         this.playerService = playerService;
     }
 
-    public RosterResponse getByTeamId(UUID teamId) {
+    public RosterResponse getByTeamId(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new ResourceNotFoundException("Team not found: " + teamId));
 

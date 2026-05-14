@@ -6,8 +6,6 @@ spring:
     name: live-engine-service
   mongodb:
     uri: mongodb://localhost:27017/live_engine
-    representation:
-      uuid: standard
   rabbitmq:
     host: localhost
     port: 5672

@@ -8,7 +8,6 @@ import com.miniscore.core.exception.ResourceNotFoundException;
 import com.miniscore.core.repository.PlayerRepository;
 import com.miniscore.core.repository.TeamRepository;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,7 +26,6 @@ public class PlayerService {
                 .orElseThrow(() -> new ResourceNotFoundException("Team not found: " + request.teamId()));
 
         Player player = new Player(
-                UUID.randomUUID(),
                 request.firstName(),
                 request.lastName(),
                 request.position(),
@@ -44,7 +42,7 @@ public class PlayerService {
                 .toList();
     }
 
-    public PlayerResponse getById(UUID playerId) {
+    public PlayerResponse getById(Long playerId) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Player not found: " + playerId));
         return toResponse(player);

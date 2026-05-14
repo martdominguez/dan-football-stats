@@ -1,15 +1,14 @@
 package com.miniscore.stats.event;
 
 import java.time.Instant;
-import java.util.UUID;
 
 public record GoalScoredEvent(
-        UUID matchId,
-        UUID leagueId,
+        String matchId,
+        Long leagueId,
         String leagueName,
-        UUID teamId,
+        Long teamId,
         String teamName,
-        UUID playerId,
+        Long playerId,
         String playerName,
         Integer minute,
         Integer homeScore,

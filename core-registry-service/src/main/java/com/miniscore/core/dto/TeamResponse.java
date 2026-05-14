@@ -1,9 +1,7 @@
 package com.miniscore.core.dto;
 
-import java.util.UUID;
-
 public record TeamResponse(
-        UUID teamId,
+        Long teamId,
         String name,
         String shortName,
         Long leagueId,

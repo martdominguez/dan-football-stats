@@ -3,7 +3,7 @@ package com.miniscore.live.document;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,14 +11,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class MatchDocument {
 
     @Id
-    private String id;
+    private ObjectId id;
 
-    private UUID matchId;
-    private UUID leagueId;
+    private Long leagueId;
     private String leagueName;
-    private UUID homeTeamId;
+    private Long homeTeamId;
     private String homeTeamName;
-    private UUID awayTeamId;
+    private Long awayTeamId;
     private String awayTeamName;
     private MatchStatus status;
     private Instant kickoffTime;
@@ -28,9 +27,8 @@ public class MatchDocument {
     private int awayScore;
     private List<TimelineEvent> timeline = new ArrayList<>();
 
-    public MatchDocument(UUID matchId, UUID leagueId, String leagueName, UUID homeTeamId, String homeTeamName,
-                         UUID awayTeamId, String awayTeamName, Instant kickoffTime) {
-        this.matchId = matchId;
+    public MatchDocument(Long leagueId, String leagueName, Long homeTeamId, String homeTeamName,
+                         Long awayTeamId, String awayTeamName, Instant kickoffTime) {
         this.leagueId = leagueId;
         this.leagueName = leagueName;
         this.homeTeamId = homeTeamId;
@@ -44,15 +42,11 @@ public class MatchDocument {
     protected MatchDocument() {
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public UUID getMatchId() {
-        return matchId;
-    }
-
-    public UUID getLeagueId() {
+    public Long getLeagueId() {
         return leagueId;
     }
 
@@ -60,7 +54,7 @@ public class MatchDocument {
         return leagueName;
     }
 
-    public UUID getHomeTeamId() {
+    public Long getHomeTeamId() {
         return homeTeamId;
     }
 
@@ -68,7 +62,7 @@ public class MatchDocument {
         return homeTeamName;
     }
 
-    public UUID getAwayTeamId() {
+    public Long getAwayTeamId() {
         return awayTeamId;
     }
 

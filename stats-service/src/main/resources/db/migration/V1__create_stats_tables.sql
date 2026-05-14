@@ -1,6 +1,6 @@
 CREATE TABLE team_standings (
     id BIGSERIAL PRIMARY KEY,
-    team_id UUID NOT NULL UNIQUE,
+    team_id BIGINT NOT NULL UNIQUE,
     team_name VARCHAR(120) NOT NULL,
     league_name VARCHAR(120) NOT NULL,
     played INTEGER NOT NULL,
@@ -15,9 +15,9 @@ CREATE TABLE team_standings (
 
 CREATE TABLE player_scorers (
     id BIGSERIAL PRIMARY KEY,
-    player_id UUID NOT NULL UNIQUE,
+    player_id BIGINT NOT NULL UNIQUE,
     player_name VARCHAR(120) NOT NULL,
-    team_id UUID NOT NULL,
+    team_id BIGINT NOT NULL,
     team_name VARCHAR(120) NOT NULL,
     goals INTEGER NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL

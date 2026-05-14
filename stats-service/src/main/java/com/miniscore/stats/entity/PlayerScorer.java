@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(name = "player_scorers")
@@ -18,13 +17,13 @@ public class PlayerScorer {
     private Long id;
 
     @Column(name = "player_id", nullable = false, unique = true)
-    private UUID playerId;
+    private Long playerId;
 
     @Column(name = "player_name", nullable = false)
     private String playerName;
 
     @Column(name = "team_id", nullable = false)
-    private UUID teamId;
+    private Long teamId;
 
     @Column(name = "team_name", nullable = false)
     private String teamName;
@@ -38,7 +37,7 @@ public class PlayerScorer {
     protected PlayerScorer() {
     }
 
-    public PlayerScorer(UUID playerId, String playerName, UUID teamId, String teamName) {
+    public PlayerScorer(Long playerId, String playerName, Long teamId, String teamName) {
         this.playerId = playerId;
         this.playerName = playerName;
         this.teamId = teamId;
@@ -47,7 +46,7 @@ public class PlayerScorer {
         this.updatedAt = Instant.now();
     }
 
-    public UUID getPlayerId() {
+    public Long getPlayerId() {
         return playerId;
     }
 
@@ -55,7 +54,7 @@ public class PlayerScorer {
         return playerName;
     }
 
-    public UUID getTeamId() {
+    public Long getTeamId() {
         return teamId;
     }
 

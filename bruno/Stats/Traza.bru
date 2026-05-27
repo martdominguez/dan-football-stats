@@ -1,0 +1,16 @@
+meta {
+  name: Traza
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:8080/stats/api/stats/demo/trace
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

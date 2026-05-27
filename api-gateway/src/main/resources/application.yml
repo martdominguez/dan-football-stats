@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: api-gateway
+  reactor:
+    # Hace explicita la propagacion de contexto en el stack reactivo del gateway.
+    context-propagation: auto
   cloud:
     gateway:
       server:
@@ -53,7 +56,24 @@ springdoc:
       - name: stats-service
         url: /stats/api-docs
 
+logging:
+  include-application-name: false
+  pattern:
+    # Dejamos visible service name + traceId + spanId para correlacionar logs con Tempo y Loki.
+    correlation: "[${spring.application.name:},%X{traceId:-},%X{spanId:-}] "
+
 management:
+  tracing:
+    # En local sampleamos todo para que el recorrido completo se vea en Grafana/Tempo.
+    sampling:
+      probability: 1.0
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:http://localhost:4318/v1/traces}
+    resource-attributes:
+      service.name: ${spring.application.name}
   endpoint:
     health:
       show-details: always

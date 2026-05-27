@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class TestController {
 
     private final Environment environment;
-
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(TestController.class);
     public TestController(Environment environment) {
         this.environment = environment;
     }
@@ -38,7 +39,7 @@ public class TestController {
     public Map<String, Object> getContext(HttpServletRequest request) {
         Map<String, Object> context = new LinkedHashMap<>();
         Instant now = Instant.now();
-
+        logger.info("Received request for /api/test/context at {}", now);
         context.put(
             "serviceName",
             environment.getProperty("spring.application.name")
@@ -47,6 +48,7 @@ public class TestController {
             "instanceId",
             environment.getProperty("eureka.instance.instance-id")
         );
+        logger.info("test {} ",context);
         //context.put("serverPort", environment.getProperty("local.server.port", request.getLocalPort()));
         context.put("serverHostName", resolveHostName());
         context.put("serverIp", resolveHostAddress());

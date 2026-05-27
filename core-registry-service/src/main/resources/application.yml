@@ -34,7 +34,24 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+logging:
+  include-application-name: false
+  pattern:
+    # Dejamos visible service name + traceId + spanId para correlacionar logs con Tempo y Loki.
+    correlation: "[${spring.application.name:},%X{traceId:-},%X{spanId:-}] "
+
 management:
+  tracing:
+    # En local sampleamos todo para que cada request de la demo aparezca en Tempo.
+    sampling:
+      probability: 1.0
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:http://localhost:4318/v1/traces}
+    resource-attributes:
+      service.name: ${spring.application.name}
   endpoint:
     health:
       show-details: always

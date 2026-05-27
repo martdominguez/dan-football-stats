@@ -65,6 +65,8 @@ services:
       SPRING_DATASOURCE_USERNAME: miniscore
       SPRING_DATASOURCE_PASSWORD: miniscore
       EUREKA_SERVER_URL: http://discovery-server:8761/eureka/
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED: "false"
     expose:
       - "8080"
 
@@ -82,6 +84,8 @@ services:
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
       EUREKA_SERVER_URL: http://discovery-server:8761/eureka/
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED: "false"
     expose:
       - "8080"
 
@@ -103,6 +107,8 @@ services:
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
       EUREKA_SERVER_URL: http://discovery-server:8761/eureka/
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED: "false"
     expose:
       - "8080"
   api-gateway:
@@ -119,12 +125,57 @@ services:
       - LIVE_ENGINE_BASE_URL=http://live-engine-service:8080
       - STATS_BASE_URL=http://stats-service:8080
       - EUREKA_SERVER_URL=http://discovery-server:8761/eureka/
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4318/v1/traces
+      - MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED=false
     ports:
       - "8080:8080"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.127.0
+    command:
+      - --config=/etc/otelcol-contrib/config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./monitoring/otel-collector/config.yml:/etc/otelcol-contrib/config.yaml:ro
+
+  tempo:
+    image: grafana/tempo:2.8.1
+    command:
+      - -config.file=/etc/tempo/tempo.yml
+    ports:
+      - "3200:3200"
+    volumes:
+      - ./monitoring/tempo/tempo.yml:/etc/tempo/tempo.yml:ro
+      - tempo-data:/var/tempo
+
+  loki:
+    image: grafana/loki:3.6.1
+    command:
+      - -config.file=/etc/loki/loki-config.yml
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./monitoring/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki-data:/loki
+
+  promtail:
+    image: grafana/promtail:3.6.1
+    depends_on:
+      - loki
+    command:
+      - -config.file=/etc/promtail/promtail-config.yml
+    volumes:
+      - ./monitoring/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   prometheus:
     image: prom/prometheus:v3.5.0
     depends_on:
+      - otel-collector
+      - tempo
+      - loki
       - discovery-server
       - core-registry-service
       - live-engine-service
@@ -144,6 +195,8 @@ services:
     image: grafana/grafana:12.0.2
     depends_on:
       - prometheus
+      - tempo
+      - loki
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
@@ -160,3 +213,5 @@ volumes:
   mongo-live-data:
   prometheus-data:
   grafana-data:
+  tempo-data:
+  loki-data:
